@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: General question / bug report
+    url: https://github.com/Nohyunjin/orgmem-probe/issues/new
+    about: Open a blank issue for anything not covered by the probe-feedback templates.

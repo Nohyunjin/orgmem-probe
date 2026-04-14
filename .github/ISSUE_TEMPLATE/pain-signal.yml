@@ -1,0 +1,82 @@
+name: "Pain signal (Q1 validation)"
+description: "Tell me, concretely, whether the 'my agent can't reach our docs + tasks' pain is real for you."
+title: "[pain] "
+labels: ["probe-feedback", "q1-pain"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks — this is the single most valuable piece of feedback for deciding
+        whether Phase 1 gets built.
+
+        Please answer from your own lived experience, not from what you imagine
+        your team would say. One honest "no" helps more than ten polite "maybes".
+
+  - type: dropdown
+    id: team_size
+    attributes:
+      label: "Team size (eng headcount)"
+      options:
+        - Solo builder
+        - 2–10
+        - 11–50
+        - 50+
+        - Not on an eng team
+    validations:
+      required: true
+
+  - type: dropdown
+    id: agent_daily
+    attributes:
+      label: "How often do you use an AI coding agent (Claude Code, Cursor, Codex, etc.)?"
+      options:
+        - Multiple times a day
+        - Once a day
+        - A few times a week
+        - Occasionally
+        - Not really
+    validations:
+      required: true
+
+  - type: dropdown
+    id: pain_score
+    attributes:
+      label: "Pain score (1–10) for: 'my agent doesn't have the org context it needs (docs, decisions, tasks)'"
+      description: "1 = never a problem. 10 = blocks me daily."
+      options:
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
+        - "6"
+        - "7"
+        - "8"
+        - "9"
+        - "10"
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: "How do you work around this today?"
+      description: "Concrete, not aspirational. 'I paste PRDs into the chat' is gold; 'we should build something' is not."
+      placeholder: "e.g. I keep a markdown scratchpad, hand-paste Linear descriptions into Claude, and re-explain context every new session."
+    validations:
+      required: true
+
+  - type: textarea
+    id: buy_signal
+    attributes:
+      label: "Would you run a beta version of an agent-native knowledge graph?"
+      description: "Be specific about what would make it a yes or a no. 'Maybe' is a no for scoring purposes."
+      placeholder: "Yes if X. No unless Y."
+    validations:
+      required: true
+
+  - type: input
+    id: handle
+    attributes:
+      label: "Handle (optional)"
+      description: "If you're open to a 30-min interview, drop your X/email/Slack."

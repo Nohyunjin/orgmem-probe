@@ -1,0 +1,50 @@
+name: "My stats (Q3 validation)"
+description: "Paste the output of `orgmem-probe stats` so we can count returning users."
+title: "[stats] "
+labels: ["probe-feedback", "q3-stats"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping close the Q3 gate — "2+ users run the probe on 2+ different days".
+
+        Run this in your terminal, then paste the JSON output below:
+
+        ```
+        orgmem-probe stats
+        ```
+
+        **Your installId is random and not tied to your identity.** Feel free to
+        scrub it if you want — `distinctDaysUsed` and `counts` are the fields
+        that matter.
+
+  - type: textarea
+    id: stats_json
+    attributes:
+      label: "`orgmem-probe stats` output (JSON)"
+      description: "Paste the full JSON. A code block is fine."
+      render: json
+      placeholder: |
+        {
+          "installId": "…",
+          "firstRunAt": "…",
+          "telemetryDir": "…",
+          "totalEvents": 0,
+          "distinctDaysUsed": 0,
+          "counts": {}
+        }
+    validations:
+      required: true
+
+  - type: input
+    id: context
+    attributes:
+      label: "Setup context (optional but useful)"
+      description: "One line: which agent, roughly how big your vault is, what you used it for."
+      placeholder: "Claude Code, ~200-doc vault, mostly docs_search + decisions_extract for weekly review"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: "Anything broken or surprising?"
+      description: "Optional. If a tool call returned something weird or the install hit a snag."

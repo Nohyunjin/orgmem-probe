@@ -1,5 +1,10 @@
 # orgmem-probe
 
+[![npm version](https://img.shields.io/npm/v/orgmem-probe.svg)](https://www.npmjs.com/package/orgmem-probe)
+[![npm downloads](https://img.shields.io/npm/dw/orgmem-probe.svg?label=weekly%20downloads)](https://www.npmjs.com/package/orgmem-probe)
+[![GitHub stars](https://img.shields.io/github/stars/Nohyunjin/orgmem-probe.svg?style=social)](https://github.com/Nohyunjin/orgmem-probe/stargazers)
+[![probe gate](https://img.shields.io/badge/phase%200%20gate-open%20until%202026--04--21-blue)](#goalposts-locked-measurement-methodology)
+
 **Phase 0 probe** for an Organizational Memory OS — a read-only MCP wrapper that lets
 your AI agent (Claude Code, Cursor, Claude Desktop, etc.) pull three kinds of
 organizational knowledge through a single protocol:
@@ -30,6 +35,68 @@ project to advance to Phase 1.
 Answers will be filled in here once the 1-week probe closes. If Q1 or (Q2 AND Q3)
 fail, the project pivots per the CEO plan's Pivot Scenarios section rather than
 starting Phase 1.
+
+---
+
+## Goalposts-locked: measurement methodology
+
+Written publicly, before the numbers come in, so the gate can't be retroactively
+softened. **Probe window: 2026-04-14 → 2026-04-21 (7 days).** Whatever the
+counts say at 2026-04-21 00:00 UTC is the answer.
+
+### Q1 — pain signal (≥3 of 5)
+
+- **Who counts:** self-identified engineering team leads at teams of size
+  2–50 who use an AI coding agent at least a few times a week. Solo builders
+  and "not really using agents" responses are recorded but not counted
+  toward the gate.
+- **How it's collected:**
+  1. Five 30-minute interviews (cold outreach via HN/X/Slack from the launch
+     posts). Notes live in `docs/interviews/` (gitignored — respects
+     interviewee privacy).
+  2. The [**Pain signal** GitHub issue template](https://github.com/Nohyunjin/orgmem-probe/issues/new?template=pain-signal.yml)
+     captures pain score (1–10), workaround, buy-signal, team size. Anyone
+     who scores ≥7 and describes a concrete workaround counts toward the
+     "3+ agree" threshold; any interview with the same pattern also counts.
+- **Pass condition:** 3+ qualifying respondents score ≥7 AND 2+ of those are
+  in the target segment (2–10 person AI-native eng team).
+
+### Q2 — installs (≥10 distinct)
+
+- **Primary signal:** npm weekly download count for `orgmem-probe` (see the
+  badge at the top). npm counts unique download events per IP per week, so
+  this is a reasonable floor for distinct humans.
+- **Secondary signal:** GitHub stars on `Nohyunjin/orgmem-probe`. Stars are
+  softer than downloads but cheap to observe, and the combination helps
+  triangulate bots vs. humans.
+- **Pass condition:** weekly npm downloads ≥ 10 OR GitHub stars ≥ 10 during
+  the 7-day window. If only one of the two hits, the gate still passes but
+  Q3 becomes the tiebreaker.
+
+### Q3 — returning users (≥2 with ≥2 distinct days)
+
+The probe logs tool invocations to a local file at `~/.orgmem-probe/usage.jsonl`.
+Nothing is phoned home. To answer Q3, we need users to **voluntarily** share
+their `orgmem-probe stats` output.
+
+- **Collection:** the [**My stats** GitHub issue template](https://github.com/Nohyunjin/orgmem-probe/issues/new?template=my-stats.yml)
+  asks for a single JSON paste and tags the issue `q3-stats`. Filter:
+  [`label:q3-stats`](https://github.com/Nohyunjin/orgmem-probe/issues?q=label%3Aq3-stats).
+- **Counting rule:** an install counts toward Q3 if its submitted stats show
+  `distinctDaysUsed >= 2`.
+- **Pass condition:** ≥2 submitted `q3-stats` issues meet the counting rule
+  by 2026-04-21.
+
+### Gate aggregation
+
+| Result | Next step |
+|---|---|
+| Q1 green AND (Q2 AND Q3) green | Start Phase 1 per the CEO plan |
+| Q1 green, Q2 OR Q3 red | Extend probe 1 week, push distribution harder |
+| Q1 red | Pivot per CEO plan Pivot Scenarios (intelligence-layer first, or narrow use case) |
+
+Results + a short post-mortem will be published in this README and as a reply
+on the launch thread on or before 2026-04-22.
 
 ---
 
