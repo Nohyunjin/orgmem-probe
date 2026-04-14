@@ -156,9 +156,9 @@ no local cache. Needs `ANTHROPIC_API_KEY`.
 
 - `path` (string, required)
 
-Output shape is aligned with the Phase 1 eval harness
-(`eval/decision-extractor-v1.jsonl`, 60 labeled pairs, ≥90% precision target),
-so the same prompt can be regression-tested later.
+Output shape is aligned with the Phase 1 eval harness (a 60-pair labeled
+dataset with a ≥90% precision / ≥70% recall gate), so the same prompt can be
+regression-tested before Phase 1 ships.
 
 ### `decisions_classify`
 Binary classifier for a single snippet: `"decision"` or `"non_decision"`.
@@ -199,8 +199,8 @@ If this probe earns the three green checks above, those pieces land next.
 ## Development
 
 ```bash
-git clone https://github.com/<owner>/doc-mvp.git
-cd doc-mvp
+git clone https://github.com/Nohyunjin/orgmem-probe.git
+cd orgmem-probe
 npm install
 npm run build
 npm run smoke   # spins up the server against a temp vault, runs initialize + tools/list + tools/call

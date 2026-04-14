@@ -4,6 +4,14 @@
   "description": "Phase 0 probe: read-only MCP wrapper exposing Obsidian vault + Linear as graph-like resources (docs/tasks/decisions)",
   "keywords": ["mcp", "obsidian", "linear", "knowledge-graph", "agent", "claude", "cursor"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nohyunjin/orgmem-probe.git"
+  },
+  "homepage": "https://github.com/Nohyunjin/orgmem-probe#readme",
+  "bugs": {
+    "url": "https://github.com/Nohyunjin/orgmem-probe/issues"
+  },
   "type": "module",
   "bin": {
     "orgmem-probe": "dist/index.js"
