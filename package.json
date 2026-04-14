@@ -1,0 +1,37 @@
+{
+  "name": "orgmem-probe",
+  "version": "0.1.0",
+  "description": "Phase 0 probe: read-only MCP wrapper exposing Obsidian vault + Linear as graph-like resources (docs/tasks/decisions)",
+  "keywords": ["mcp", "obsidian", "linear", "knowledge-graph", "agent", "claude", "cursor"],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "orgmem-probe": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build",
+    "smoke": "npm run build && node scripts/smoke.mjs",
+    "test": "npm run smoke"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@anthropic-ai/sdk": "^0.32.1",
+    "gray-matter": "^4.0.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}
