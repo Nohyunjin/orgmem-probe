@@ -59,11 +59,21 @@ Respond with STRICT JSON only (no prose, no markdown fences):
 // hints (incl. Constraints block), table-column extraction rule, and a strict
 // VERBATIM rule (no parenthetical commentary like "(Challenge #N decision)"
 // which bloats text and breaks fuzzy matcher). Cap raised 10 → 15 per doc.
-// v1.1 recall=0.900 (18/20) — ceo-plans 1.000, design 0.800. The two residual
-// design misses (d018 bare-version-tag snippet, d020 Constraints sibling) are
-// dataset/marginal and tracked in eval/RESOLUTION-BACKLOG.md.
-// CLASSIFY_SYSTEM v2 unchanged — verified no regression (P=1.000 R=0.967).
-// See eval/results/extract-v1.1-20260415.json.
+//
+// Baselines (extract path, temperature=0, haiku-4-5):
+//   - v1 dataset:   recall=0.900 (18/20) — ceo-plans 1.000, design 0.800
+//   - v1.1 dataset: recall=0.900 (18/20) — ceo-plans 1.000, design 0.800
+//                   (d018 rewritten with "MVP에서 제외:" prefix; recall stable
+//                    since extract harness skips synthetic entries anyway)
+//
+// CLASSIFY_SYSTEM v2 unchanged.
+//   - v1 dataset:   P=1.000 R=0.967 F1=0.983 (hard recall 0.667)
+//   - v1.1 dataset: P=1.000 R=0.971 F1=0.986 (hard recall 0.875) — improved
+//                   via d018 prefix rewrite + 5 new hard-decision entries
+//                   all correctly classified.
+//
+// See eval/results/extract-v1.1-on-v1.1-dataset-20260415.json and
+//     eval/results/v2-classify-v1.1-20260415.json.
 const EXTRACT_SYSTEM = `You extract DECISION statements from a markdown document.
 
 A DECISION is a sentence / list item / short paragraph where the team has made a
@@ -188,6 +198,10 @@ export async function extractDecisionsFromDoc(
   const res = await client.messages.create({
     model,
     max_tokens: 2000,
+    // temperature=0 for reproducibility — classify already uses 0; extract was
+    // previously unset (SDK default ≈1.0) which produced ±0.05 recall variance
+    // between runs. Locked at 0 for v1.1 eval baseline (2026-04-15).
+    temperature: 0,
     system: EXTRACT_SYSTEM,
     messages: [
       {
