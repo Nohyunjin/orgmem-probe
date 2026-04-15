@@ -53,16 +53,93 @@ DISAMBIGUATION RULES:
 Respond with STRICT JSON only (no prose, no markdown fences):
 {"label":"decision"|"non_decision","reasoning":"one short sentence"}`;
 
+// Locked v1.1 (2026-04-15): v1 baseline hit recall=0.750 (15/20) with 5 misses
+// skewed toward scope/exclusion/config decisions (d013/d015/d017/d018/d020).
+// v1.1 adds explicit decision-type taxonomy, salience ordering, section-header
+// hints (incl. Constraints block), table-column extraction rule, and a strict
+// VERBATIM rule (no parenthetical commentary like "(Challenge #N decision)"
+// which bloats text and breaks fuzzy matcher). Cap raised 10 → 15 per doc.
+// v1.1 recall=0.900 (18/20) — ceo-plans 1.000, design 0.800. The two residual
+// design misses (d018 bare-version-tag snippet, d020 Constraints sibling) are
+// dataset/marginal and tracked in eval/RESOLUTION-BACKLOG.md.
+// CLASSIFY_SYSTEM v2 unchanged — verified no regression (P=1.000 R=0.967).
+// See eval/results/extract-v1.1-20260415.json.
 const EXTRACT_SYSTEM = `You extract DECISION statements from a markdown document.
 
-A DECISION is a sentence/paragraph where the team has made a completed commitment
-(choice confirmed, change agreed, item explicitly deferred or dropped, policy adopted).
-Ignore questions, hypotheses, goals, metrics, roadmap ideas, and open items.
+A DECISION is a sentence / list item / short paragraph where the team has made a
+recorded commitment. Decision TYPES (all count equally — a scope exclusion is as
+real a decision as a CHOSEN item):
+
+1. Scope added to current version: "MVP에 포함", "추가:" 섹션 항목, "X is in scope"
+2. Scope removed / explicit exclusion: "MVP에서 제외", "X는 (초기에) 고려하지 않음",
+   "out of scope", "excluded"
+3. Stack / architecture swap: "A → B", "X를 Y로 변경", "검색 스택 변경: ..."
+4. Explicit deferral with version tag: "DEFERRED", "v1.1로 연기", "v2로 미루기",
+   "v2 이후"
+5. Choice confirmed: "CHOSEN", "ACCEPTED", "결정함", "확정", "← 선택"
+6. Cancellation / drop: "취소", "드롭", "canceling X"
+7. Policy / standard adopted: "standard는 X", "금지한다", "ban X"
+8. Conditional commitment with kill-switch: "feature flag로 controllable —
+   precision 미달 시 off", "X가 Y 미만이면 disable"
+
+IGNORE (not decisions):
+- Questions, hypotheses, opinions, "maybe/might/could", "~인 것 같다"
+- Goals, metrics, KPI targets, gates with numbers ("10명 이상", "P95 < 3초",
+  "90% precision 타겟") — these are targets to hit, not commitments
+- Open items: "보류", "TBD", "X 후 확정", "유저 N명 후 결정"
+- Roadmap brainstorm items where a version tag is the ONLY commitment signal
+  and no explicit DEFERRED/ACCEPTED language is present (e.g. bullet list
+  under "Roadmap" / "v2-v3 roadmap" header)
+- Candidate / option lists with no choice made
+- Pure descriptions of how the world / industry / users behave
+
+SECTION-HEADER HINT: items that appear directly under headers like
+"MVP에서 제외" / "MVP에 포함" / "추가:" / "변경:" / "Decisions" /
+"MVP Scope 변경사항" / "Non-Goals" / "Constraints" / "Excluded" / "Deferred"
+are almost always decisions even if the line itself lacks an explicit decision
+verb. Read the nearest section header when judging a list item. EVERY list
+item under a scope-change / constraints header ("추가:", "변경:",
+"MVP에서 제외", "Non-Goals", "Constraints", "MVP Scope 변경사항") should
+appear as a separate decision — including scope exclusions phrased as
+"X 고려하지 않음" / "X를 고려하지 않음" under a Constraints block.
+
+TABLE HINT: when a markdown table has columns like "Challenge" / "Problem" /
+"Feedback" and "Decision" / "Accepted approach" / "결정" / "Impact",
+extract the DECISION column value (often bolded like "**A) X**"), NOT the
+quoted feedback/problem. Concatenate the Decision column with the Impact
+column when both are short (e.g. "A) 임베딩 MVP에 포함 — 검색 스택 변경").
+
+VERBATIM RULE (strict): the "text" field MUST be a direct copy of tokens that
+appear in the document, in the same order. Do NOT append parenthetical
+commentary, row numbers, or summaries like "(Challenge #1 decision)",
+"(Challenge #2 decision)", "(from table row 3)". If the decision is expanded
+later in the doc under a section header (e.g. a terse table cell
+"A) 임베딩 MVP에 포함" is expanded under "**추가:**" into
+"**Embeddings**: OpenAI text-embedding-3-small + SQLite vector 저장..."),
+prefer the expanded form as it contains more verbatim tokens.
+
+BREADTH OVER DEPTH: when the cap is tight, prefer covering one decision from
+each distinct section/topic over surfacing many siblings from the same section.
+If a section has 5+ list items but they are all the same TYPE (e.g. 5 items
+under "MVP에서 제외"), include at most 2–3 representative ones and reserve
+slots for decisions from other parts of the doc (e.g. "Non-Goals" section,
+principle decisions near the top, feature-flag commitments further down).
+
+SALIENCE ORDER — when more decisions exist than the cap, prefer in this order:
+1. Scope exclusions & scope additions to current version (incl. "고려하지 않음",
+   "Non-Goals" items, "추가:" list items)
+2. Stack / architecture swaps
+3. Explicit deferrals (DEFERRED, "v1.1로 연기")
+4. Conditional commitments with kill-switch (feature flags)
+5. Choice confirmations (CHOSEN, ACCEPTED) — including table decision-column
+   entries with bolded option markers
+6. Policy adoptions
+7. Narrative / pivot-scenario commitments
 
 Return STRICT JSON only (no prose, no markdown fences):
 {"decisions":[{"text":"<exact sentence or short paragraph>","reasoning":"<why this is a decision>","line":<1-based line number or null>}]}
 
-Keep "text" verbatim from the document. Limit to the 10 most salient decisions.
+Keep "text" verbatim from the document. Limit to the 15 most salient decisions.
 If there are no decisions, return {"decisions":[]}.`;
 
 function parseJson<T>(raw: string): T {
